@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Import Cursor CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='glowingcursor.css') }}">
+
+    <!-- Import Cursor JS -->
+    <script src="{{ url_for('static', filename='hidecursor.js') }}" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .footer-credit {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            font-size: 1rem;
+            color: #35af1d;
+            opacity: 0.8;
+            font-family: "Press Start 2P", sans-serif;
+        }
+
+        /* Remove the underline from the buttons */
+        a {
+            text-decoration: none;
+        }
+
+        /* Make sure body has the background */
+        body {
+            font-family: "Press Start 2P", sans-serif;
+            background-color: #0c0c0d;
+            color: #f4f4f5;
+            height: 200vh;
+            /* Background Image */
+            background-image: url('{{ url_for("static", filename="bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Ensure canvas is above the background but below text */
+        #dotsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            /* Keeps it behind text */
+            pointer-events: none;
+            /* Prevents interaction */
+        }
+
+
+        /* Welcome Page (Floating Screen) */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(12, 12, 13, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            z-index: 10;
+        }
+
+        /* Hide Welcome Screen on Scroll */
+        .hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+
+        /* Sidebar Container */
+        .sidebar {
+            position: fixed;
+            left: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Button Styling */
+        .btn {
+            line-height: 1.8rem;
+            border-radius: 9.5px;
+            display: inline-flex;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            position: relative;
+            background-color: #18181b;
+            color: #f4f4f5;
+            transition: background-color 0.2s ease-in-out;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            width: 150px;
+        }
+
+        .btn:hover {
+            background-color: #0c0c0d;
+        }
+
+        .btn:before {
+            content: "";
+            position: absolute;
+            background: linear-gradient(to right, rgb(0, 220, 130), rgb(0, 220, 130), rgb(0, 220, 130));
+            inset: -2px;
+            z-index: -1;
+            border-radius: 12.5px;
+            transition: all 0.2s ease 0s;
+        }
+
+        .btn:hover:before {
+            box-shadow: rgba(0, 220, 130, 0.5) 0px 0px 10px 0px,
+                rgba(0, 220, 130, 0.5) 0px 0px 20px 0px;
+        }
+
+        /* Description Styling */
+        .descriptions {
+            position: fixed;
+            top: 50%;
+            left: 280px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0;
+            opacity: 1;
+        }
+
+        .description {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            line-height: 5.0rem;
+        }
+
+        /* Show descriptions only when hovered */
+        .sidebar:hover+.descriptions {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="dotsCanvas"></canvas>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen" style="font-size: 50px; color: #35af1d;">
+        <span>Welcome to Cactus Wallet</span>
+    </div>
+
+    <!-- Sidebar Buttons -->
+    <div class="sidebar" id="sidebar">
+        <a class="btn" href="/send_eth"><span>Transfer Eth</span></a>
+        <a class="btn" href="/send_token_page"><span>Transfer Token</span></a>
+        <a class="btn" href="/sweeper_bot"><span>Sweeper Bot</span></a>
+        <a class="btn" href="/selfdestruct"><span>Self Destruct</span></a>
+
+    </div>
+
+    <div class="descriptions">
+        <p class="description">Initiates an ETH transfer process.</p>
+        <p class="description">Initiates an Token transfer process.</p>
+        <p class="description">Setup your Sweeper Bot.</p>
+        <p class="description">Triggers a self-destruction sequence.</p>
+    </div>
+
+    <script>
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener("scroll", function () {
+            let currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY) {
+                // Scrolling down - Hide Welcome Screen
+                document.getElementById("welcomeScreen").classList.add("hidden");
+            } else {
+                // Scrolling up - Show Welcome Screen
+                document.getElementById("welcomeScreen").classList.remove("hidden");
+            }
+
+            lastScrollY = currentScrollY;
+        });
+    </script>
+    <script>
+        // Glowing dots animation for background
+        const canvas = document.getElementById('dotsCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const dots = [];
+        const numDots = 200;
+
+        for (let i = 0; i < numDots; i++) {
+            dots.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                vx: (Math.random() * 0.5) - 0.25,
+                vy: (Math.random() * 0.5) - 0.25
+            });
+        }
+
+        function drawDots() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let dot of dots) {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = 'rgba(57, 255, 20, 0.8)'; // Neon green color
+                ctx.shadowBlur = 15; // Increase blur for glow effect
+                ctx.shadowColor = 'rgba(57, 255, 20, 0.8)'; // Neon green glow
+                ctx.fill();
+
+                dot.x += dot.vx;
+                dot.y += dot.vy;
+
+                if (dot.x < 0 || dot.x > canvas.width) dot.vx = -dot.vx;
+                if (dot.y < 0 || dot.y > canvas.height) dot.vy = -dot.vy;
+            }
+
+            requestAnimationFrame(drawDots);
+        }
+
+        drawDots();
+
+        // Resize canvas when window is resized
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+<div class="footer-credit">
+    - By ZIMZ
+</div>
+</body>
+
+</html>

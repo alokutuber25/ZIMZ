@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweeper Bot Logs</title>
+    <!-- Import Cursor CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='glowingcursor.css') }}">
+
+    <!-- Import Cursor JS -->
+    <script src="{{ url_for('static', filename='hidecursor.js') }}" defer></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        function fetchLogs() {
+            fetch("/get_logs") // Fetch logs from Flask API
+                .then(response => response.json())
+                .then(data => {
+                    let logContainer1 = document.getElementById("logContainer1");
+                    let logContainer2 = document.getElementById("logContainer2");
+
+                    logContainer1.innerHTML = ""; // Clear old logs
+                    logContainer2.innerHTML = ""; // Clear old transaction logs
+
+                    if (data.length === 0) {
+                        logContainer1.innerHTML = "<p class='no-logs'>No logs available.</p>";
+                        logContainer2.innerHTML = "<p class='no-logs'>No transaction logs available.</p>";
+                    } else {
+                        data.forEach(log => {
+                            let logEntry = document.createElement("p");
+                            logEntry.classList.add("log-entry");
+                            logEntry.style.fontStyle = "italic"; // Italics style
+                            logEntry.style.marginBottom = "10px"; // Space between logs
+
+                            // Check if the message contains a transaction hash
+                            if (log.message.includes("Transaction sent with hash:")) {
+                                let txHash = log.message.split("Transaction sent with hash: ")[1].trim();
+                                logEntry.innerHTML = `<strong>${log.timestamp}</strong>: 
+                                    Transaction sent with hash: 
+                                    <a href="https://arbiscan.io/tx/0x${txHash}" target="_blank" style="color: #17a2b8; text-decoration: underline;">
+                                        ${txHash}
+                                    </a>`;
+                                logContainer2.appendChild(logEntry.cloneNode(true)); // Also add to LogContainer2
+                            } else {
+                                logEntry.innerHTML = `<strong>${log.timestamp}</strong>: ${log.message}`;
+                            }
+
+                            logContainer1.appendChild(logEntry);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching logs:", error));
+        }
+
+        function stopSweeper() {
+            fetch("/stop_sweeper", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchLogs(); // Refresh logs after stopping
+                })
+                .catch(error => console.error("Error stopping sweeper:", error));
+        }
+
+        setInterval(fetchLogs, 2000); // Fetch logs every 3 seconds
+        window.onload = fetchLogs; // Fetch logs on page load
+    </script>
+</head>
+
+<body>
+    <canvas id="dotsCanvas"></canvas>
+    <a href="/#sidebar" class="logo">
+        <img src="{{ url_for('static', filename='cacwall.jpg') }}" alt="Cactus Wallet Logo">
+    </a>   
+    <div class="main">
+        <div class="heading">
+            <h2>Sweeper Bot</h2>
+        </div>
+        <div class="container">
+            <div class="monitor-address-link">
+                {% if monitor_address %}
+                <p style="font-family: 'Press Start 2P', sans-serif; font-size: 15px;">Monitor Address:
+                    <a href="https://arbiscan.io/address/{{ monitor_address }}" target="_blank"
+                        style="color: #277219CC; text-decoration: underline;">
+                        {{ monitor_address }}
+                    </a>
+                </p>
+                {% else %}
+                <p>Monitor address not available.</p>
+                {% endif %}
+            </div>
+            <p class="loading">Loading logs...</p>
+            <div class="logs-wrapper">
+                <div class="logs-container">
+                    <ul id="logContainer1"></ul>
+                </div>
+                <div class="logs-container">
+                    <ul id="logContainer2"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="button-container">
+        <div>
+            <button class="stop-btn" onclick="stopSweeper()">Stop Sweeper</button>
+        </div>
+    </div>
+    <script>
+        // Glowing dots animation for background
+        const canvas = document.getElementById('dotsCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const dots = [];
+        const numDots = 200;
+
+        for (let i = 0; i < numDots; i++) {
+            dots.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                vx: (Math.random() * 0.5) - 0.25,
+                vy: (Math.random() * 0.5) - 0.25
+            });
+        }
+
+        function drawDots() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let dot of dots) {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = 'rgba(57, 255, 20, 0.8)'; // Neon green color
+                ctx.shadowBlur = 15; // Increase blur for glow effect
+                ctx.shadowColor = 'rgba(57, 255, 20, 0.8)'; // Neon green glow
+                ctx.fill();
+
+                dot.x += dot.vx;
+                dot.y += dot.vy;
+
+                if (dot.x < 0 || dot.x > canvas.width) dot.vx = -dot.vx;
+                if (dot.y < 0 || dot.y > canvas.height) dot.vy = -dot.vy;
+            }
+
+            requestAnimationFrame(drawDots);
+        }
+
+        drawDots();
+
+        // Resize canvas when window is resized
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+    <div class="footer-credit">
+        - By ZIMZ
+    </div>
+</body>
+
+</html>

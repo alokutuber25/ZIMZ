@@ -1,0 +1,21 @@
+/* Hide default cursor everywhere */
+* {
+    cursor: none !important;
+}
+
+/* Custom Glowing Cursor */
+.glowing-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 255, 100, 1);
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: difference;
+    box-shadow: 0 0 10px rgba(0, 255, 100, 1), 
+                0 0 20px rgba(0, 255, 100, 0.9), 
+                0 0 30px rgba(0, 255, 100, 0.8),
+                0 0 40px rgba(0, 255, 100, 0.7);
+    transition: transform 0.05s ease-out;
+    z-index: 9999;
+}

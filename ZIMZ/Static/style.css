@@ -1,0 +1,317 @@
+html {
+    scroll-behavior: smooth;
+}
+
+.footer-credit {
+    position: fixed;
+    bottom: 10px;
+    right: 20px;
+    font-size: 1rem;
+    color: #35af1d;
+    opacity: 0.8;
+    font-family: "Press Start 2P", sans-serif;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    font-family: "Press Start 2P", sans-serif;
+    background-color: black;
+    color: white;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    /* Place the canvas behind the content */
+    display: block;
+}
+
+.main {
+    height: 65vh;
+    margin: 10px;
+    color: white;
+    padding: 20px;
+    z-index: 1;
+}
+
+.container {
+    max-width: 95%;
+    margin: 5px auto;
+    height: 50%;
+    padding: 30px 150px;
+    border-radius: 8px;
+}
+
+/* Main Wrapper for Logs */
+.logs-wrapper {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    /* Space between two log containers */
+}
+
+/* Individual Log Containers */
+.logs-container {
+    flex: 1;
+    max-height: 300px;
+    /* Adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #333;
+    padding: 10px;
+    text-align: left;
+}
+
+.log-entry {
+    font-style: italic;
+    /* Italics */
+    margin-bottom: 10px;
+    /* Space between logs */
+}
+
+.transaction-log {
+    color: #17a2b8;
+    /* Highlight transaction logs */
+    font-weight: bold;
+}
+
+.logs-container ul {
+    list-style-type: none;
+    /* Remove bullet points */
+    padding: 0;
+}
+
+.logs-container ul li {
+    font-style: italic;
+    /* Make text italics */
+    margin-bottom: 10px;
+    /* Add space between logs */
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Light background for readability */
+    border-radius: 5px;
+}
+
+/* Log Entry */
+.log-entry {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+/* No Logs Message */
+.no-logs {
+    color: #999;
+}
+
+/* Loading Message */
+.loading {
+    margin-top: 50px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-style: italic;
+    color: #bbb;
+    text-align: center;
+    /* Center text */
+    display: block;
+    /* Ensures it takes full width */
+}
+
+
+/* Button Styling for Sweeper (similar to index.html) */
+.start-btn {
+    line-height: 1.8rem;
+    border-radius: 9.5px;
+    display: inline-flex;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    position: relative;
+    background-color: #18181b;
+    color: #f4f4f5;
+    transition: background-color 0.2s ease-in-out;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    width: 450px;
+    /* Adjust width as needed */
+    margin-top: 15px;
+    font-family: "Press Start 2P", sans-serif;
+    font-size: 15px;
+}
+
+.stop-btn {
+    line-height: 1.8rem;
+    border-radius: 9.5px;
+    display: inline-flex;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    position: relative;
+    background-color: #18181b;
+    color: #f4f4f5;
+    transition: background-color 0.2s ease-in-out;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    width: 400px;
+    /* Adjust width as needed */
+    margin-top: 110px;
+    font-family: "Press Start 2P", sans-serif;
+    font-size: 15px;
+}
+
+.start-btn:hover,
+.stop-btn:hover {
+    background-color: #0c0c0d;
+}
+
+.start-btn:before,
+.stop-btn:before {
+    content: "";
+    position: absolute;
+    background: linear-gradient(to right, rgb(0, 220, 130), rgb(0, 220, 130), rgb(0, 220, 130));
+    inset: -2px;
+    z-index: -1;
+    border-radius: 12.5px;
+    transition: all 0.2s ease 0s;
+}
+
+.start-btn:hover:before,
+.stop-btn:hover:before {
+    box-shadow: rgba(0, 220, 130, 0.5) 0px 0px 10px 0px,
+        rgba(0, 220, 130, 0.5) 0px 0px 20px 0px;
+}
+
+/* Center the Stop Button */
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    height: 90%;
+    /* background-color: #2c2f33; */
+    border-radius: 15px;
+    padding: 25px;
+    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    width: 80%;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    /* Add space between fields */
+}
+
+.form-control {
+    width: 60%;
+    flex: 1;
+    /* Take the remaining space */
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+h2 {
+    font-size: 35px;
+    font-weight: bold;
+    color: #50b44e;
+}
+
+.heading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    margin: 30px;
+    margin-top: 60px;
+    color: #17a2b8;
+}
+
+
+.form-label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+    width: 30%;
+}
+
+.form-control {
+    border: 2px solid rgba(39, 114, 25, 0.8);
+    /* Glowing green border */
+    background-color: #2c2c2c4f;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: rgba(39, 114, 25, 1);
+    /* Bright glowing green */
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+    /* Glowing effect */
+}
+
+.form-control::placeholder {
+    color: #bbb;
+}
+
+#logs {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: left;
+}
+
+#logs h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f8d7da;
+}
+
+#logs p {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #f8d7da;
+}
+
+/* Logo Positioning */
+.logo {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.logo img {
+    width: 100px; /* Adjust size as needed */
+    height: auto;
+    transition: transform 0.2s ease-in-out;
+}
+
+.logo img:hover {
+    transform: scale(1.1);
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETH Transfer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Import Cursor CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='glowingcursor.css') }}">
+
+    <!-- Import Cursor JS -->
+    <script src="{{ url_for('static', filename='hidecursor.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        function sendTransaction(event) {
+            event.preventDefault();
+            let formData = new FormData(document.getElementById("ethForm"));
+
+            fetch("/send_eth_transaction", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let messageBox = document.getElementById("message");
+                    if (data.status === "success") {
+                        messageBox.innerHTML = `<p style="color: green;">Transaction Sent! TX: <a href="https://arbiscan.io/tx/${data.tx_hash}" target="_blank">${data.tx_hash}</a></p>`;
+                    } else {
+                        messageBox.innerHTML = `<p style="color: red;">Error: ${data.message}</p>`;
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="dotsCanvas"></canvas>
+    <a href="/#sidebar" class="logo">
+        <img src="{{ url_for('static', filename='cacwall.jpg') }}" alt="Cactus Wallet Logo">
+    </a>    
+    <div class="main">
+        <div class="heading">
+            <h2>Send ETH</h2>
+        </div>
+        <form id="ethForm" onsubmit="sendTransaction(event)">
+            <div class="container">
+                <div class="card">
+                    <div class="form">
+                        <div class="form-group">
+                            <label class="form-label">Private Key:</label>
+                            <input type="password" name="private_key" required class="form-control"
+                                placeholder="Enter Private Key">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Receiver Address:</label>
+                            <input type="text" name="receiver" required class="form-control"
+                                placeholder="Enter Receiver Address">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">ETH Amount:</label>
+                            <input type="number" step="0.00001" name="eth_amount" required
+                                placeholder="Enter ETH Amount" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" class="start-btn">Send ETH</button>
+            </div>
+        </form>
+        <div>
+            <p id="message" style="color: #0dc882; text-align: center; padding: 30px;"></p>
+        </div>
+    </div>
+    <script>
+        // Glowing dots animation for background
+        const canvas = document.getElementById('dotsCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const dots = [];
+        const numDots = 200;
+
+        for (let i = 0; i < numDots; i++) {
+            dots.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                vx: (Math.random() * 0.5) - 0.25,
+                vy: (Math.random() * 0.5) - 0.25
+            });
+        }
+
+        function drawDots() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let dot of dots) {
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = 'rgba(57, 255, 20, 0.8)'; // Neon green color
+                ctx.shadowBlur = 15; // Increase blur for glow effect
+                ctx.shadowColor = 'rgba(57, 255, 20, 0.8)'; // Neon green glow
+                ctx.fill();
+
+                dot.x += dot.vx;
+                dot.y += dot.vy;
+
+                if (dot.x < 0 || dot.x > canvas.width) dot.vx = -dot.vx;
+                if (dot.y < 0 || dot.y > canvas.height) dot.vy = -dot.vy;
+            }
+
+            requestAnimationFrame(drawDots);
+        }
+
+        drawDots();
+
+        // Resize canvas when window is resized
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+    <div class="footer-credit">
+        - By ZIMZ
+    </div>
+</body>
+
+</html>
