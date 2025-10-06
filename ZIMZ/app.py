@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 sweeper_thread = None
 
-hel
+hell
 ERC20_ABI = [
     {
         "constant": False,
