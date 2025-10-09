@@ -8,7 +8,7 @@ solcx.install_solc('0.8.0')  # Install Solidity 0.8.0
 solcx.set_solc_version('0.8.0')  # Set the version
 from solcx import compile_source
 
-a
+ab
 app = Flask(__name__)
 
 sweeper_thread = None
